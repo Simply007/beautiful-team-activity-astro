@@ -1,12 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
-import { createDeliveryClient } from "@kontent-ai/delivery-sdk";
 import { MyComponent } from "../components/MyComponent";
+import { client } from "../lib/kontent-ai";
 
-const client = createDeliveryClient({
-  projectId: "975bf280-fd91-488c-994c-2f04416e5ee3",
-});
 const response = await client.item("on_roasts").toPromise();
 
 const headline = response.data.item.elements["title"].value;

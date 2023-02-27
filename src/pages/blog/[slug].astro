@@ -1,0 +1,32 @@
+---
+import type { IContentItem } from "@kontent-ai/delivery-sdk";
+import { client } from "../../lib/kontent-ai";
+
+export async function getStaticPaths() {
+  const response = await client.items().type("article").toAllPromise();
+
+
+  const pages =  response.data.items.map((item) => ({
+    params: { slug: item.system.codename },
+    props: {
+      item
+    },
+  }));
+
+  return pages;
+}
+
+const { system, elements } : IContentItem = Astro.props.item;
+console.log('test')
+---
+
+<html lang="en">
+  <head>
+    <title>{system.name} ({system.codename})</title>
+  </head>
+  <body>
+    <h1>{system.name} ({system.codename})</h1>
+    <time>{elements['post_date'].value}</time>
+    <article set:html={elements['body_copy'].value} />
+  </body>
+</html>

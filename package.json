@@ -10,9 +10,10 @@
 		"astro": "astro"
 	},
 	"dependencies": {
+		"@astrojs/node": "^5.0.4",
 		"@astrojs/react": "^2.0.2",
 		"@kontent-ai/delivery-sdk": "^12.4.3",
-		"astro": "^2.0.14",
+		"astro": "^2.0.16",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0"
 	}

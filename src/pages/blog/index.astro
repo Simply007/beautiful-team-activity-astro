@@ -1,0 +1,24 @@
+---
+import { client } from "../../lib/kontent-ai";
+
+const response = await client.items().type("article").toAllPromise();
+
+console.log(response.data.responses.map(response => response.hasStaleContent));
+console.log(response.data.items.map(item => item.system.codename));
+
+
+const entries = response.data.items;
+---
+
+<body>
+  {
+    entries.map(({ system, elements }) => (
+      <section>
+        <h2>
+          <a href={`/blog/${system.codename}`}>{elements["title"].value}</a>
+        </h2>
+        <p>{elements["summary"].value}</p>
+      </section>
+    ))
+  }
+</body>
