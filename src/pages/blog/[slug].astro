@@ -1,32 +1,65 @@
 ---
-import type { IContentItem } from "@kontent-ai/delivery-sdk";
+import type { Elements, IContentItem } from "@kontent-ai/delivery-sdk";
 import { client } from "../../lib/kontent-ai";
+import { PortableText } from "astro-portabletext";
+import {
+  nodeParse,
+  transformToPortableText,
+} from "@kontent-ai/rich-text-resolver";
+import type { SomePortableTextComponents } from "astro-portabletext/types";
+import Layout from "../../layouts/Layout.astro";
+import { Twitter } from "../../components/Twitter";
+import { Video } from "../../components/Video";
 
 export async function getStaticPaths() {
   const response = await client.items().type("article").toAllPromise();
 
-
-  const pages =  response.data.items.map((item) => ({
+  const pages = response.data.items.map((item) => ({
     params: { slug: item.system.codename },
     props: {
-      item
+      item,
     },
   }));
 
   return pages;
 }
 
-const { system, elements } : IContentItem = Astro.props.item;
-console.log('test')
+const { system, elements }: IContentItem = Astro.props.item;
+const richTextElement = elements.body_copy as Elements.RichTextElement;
+
+const portableTextComponents: SomePortableTextComponents = {
+  type: {
+    component: (block) => {
+      const linkedItem = richTextElement.linkedItems.find(
+        (item) => item.system.codename === block.node.component._ref
+      );
+
+      switch (linkedItem?.system.type) {
+        case "tweet": {
+          return Twitter({ linkedItem });
+        }
+        case "hosted_video": {
+          return Video({ linkedItem });
+        }
+        default: {
+          throw new Error(
+            `Unknown linked item type ${linkedItem?.system.type}`
+          );
+        }
+      }
+    },
+  },
+};
+
+const parsedTree = nodeParse(elements.body_copy.value);
+const parsedContent = transformToPortableText(parsedTree);
 ---
 
-<html lang="en">
-  <head>
-    <title>{system.name} ({system.codename})</title>
-  </head>
-  <body>
+<Layout title="Welcome to Astro.">
+  <main>
     <h1>{system.name} ({system.codename})</h1>
-    <time>{elements['post_date'].value}</time>
-    <article set:html={elements['body_copy'].value} />
-  </body>
-</html>
+    <!-- <time>{elements['post_date'].value}</time> -->
+    <!-- <article set:html={elements['body_copy'].value} /> -->
+    <PortableText value={parsedContent} components={portableTextComponents} />
+  </main>
+</Layout>

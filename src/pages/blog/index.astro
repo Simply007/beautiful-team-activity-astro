@@ -2,11 +2,6 @@
 import { client } from "../../lib/kontent-ai";
 
 const response = await client.items().type("article").toAllPromise();
-
-console.log(response.data.responses.map(response => response.hasStaleContent));
-console.log(response.data.items.map(item => item.system.codename));
-
-
 const entries = response.data.items;
 ---
 
