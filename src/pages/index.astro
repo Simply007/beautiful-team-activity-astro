@@ -1,7 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
-import { MyComponent } from "../components/MyComponent";
 import { client } from "../lib/kontent-ai";
 
 const response = await client.item("on_roasts").toPromise();
@@ -21,8 +20,6 @@ const content = response.data.item.elements["body_copy"].value;
       />
     <h2>{headline}</h2>
     <div set:html={content} />
-    <MyComponent client:load url="https://deliver.kontent.ai/2affe8e1-4825-000a-c0b5-b269e43a1e0c/items/coffee_beverages_explained"/>
-    <MyComponent client:load url="https://deliver.kontent.ai/2affe8e1-4825-000a-c0b5-b269e43a1e0c/items/on_roasts"/>
     <p class="instructions">
       To get started, open the directory <code>src/pages</code> in your project.<br
       />
