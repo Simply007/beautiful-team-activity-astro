@@ -10,6 +10,10 @@ import type { SomePortableTextComponents } from "astro-portabletext/types";
 import Layout from "../../layouts/Layout.astro";
 import { Twitter } from "../../components/Twitter";
 import { Video } from "../../components/Video";
+import Test from "../../components/Test.astro";
+import Card from "../../components/Card.astro";
+import { parse } from "@kontent-ai/rich-text-resolver/dist/cjs/src/parser/browser/rich-text-browser-parser";
+import { createBlock } from "@kontent-ai/rich-text-resolver/dist/cjs/src";
 
 export async function getStaticPaths() {
   const response = await client.items().type("article").toAllPromise();
@@ -27,32 +31,41 @@ export async function getStaticPaths() {
 const { system, elements }: IContentItem = Astro.props.item;
 const richTextElement = elements.body_copy as Elements.RichTextElement;
 
-const portableTextComponents: SomePortableTextComponents = {
-  type: {
-    component: (block) => {
-      const linkedItem = richTextElement.linkedItems.find(
-        (item) => item.system.codename === block.node.component._ref
-      );
+// Using react components
+// const portableTextComponents: SomePortableTextComponents = {
+//   type: {
+//     component: (block) => {
+//       const linkedItem = richTextElement.linkedItems.find(
+//         (item) => item.system.codename === block.node.component._ref
+//       );
 
-      switch (linkedItem?.system.type) {
-        case "tweet": {
-          return Twitter({ linkedItem });
-        }
-        case "hosted_video": {
-          return Video({ linkedItem });
-        }
-        default: {
-          throw new Error(
-            `Unknown linked item type ${linkedItem?.system.type}`
-          );
-        }
-      }
-    },
-  },
-};
+//       switch (linkedItem?.system.type) {
+//         case "tweet": {
+//           return Twitter({ linkedItem });
+//         }
+//         case "hosted_video": {
+//           return Video({ linkedItem });
+//         }
+//         default: {
+//           throw new Error(
+//             `Unknown linked item type ${linkedItem?.system.type}`
+//           );
+//         }
+//       }
+//     },
+//   },
+// };
 
 const parsedTree = nodeParse(elements.body_copy.value);
 const parsedContent = transformToPortableText(parsedTree);
+
+for (const block of parsedContent) {
+  if (block._type === "component") {
+    (block as any).data = { value: "some data I would like to add to all components" };
+  }
+
+  // pass only data to specific components by its reference
+}
 ---
 
 <Layout title="Welcome to Astro.">
@@ -60,6 +73,13 @@ const parsedContent = transformToPortableText(parsedTree);
     <h1>{system.name} ({system.codename})</h1>
     <!-- <time>{elements['post_date'].value}</time> -->
     <!-- <article set:html={elements['body_copy'].value} /> -->
-    <PortableText value={parsedContent} components={portableTextComponents} />
+    <PortableText
+      value={parsedContent}
+      components={{
+        type: {
+          component: Test,
+        },
+      }}
+    />
   </main>
 </Layout>
