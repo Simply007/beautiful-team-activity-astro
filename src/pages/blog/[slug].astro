@@ -56,16 +56,18 @@ const richTextElement = elements.body_copy as Elements.RichTextElement;
 //   },
 // };
 
-const parsedTree = nodeParse(elements.body_copy.value);
-const parsedContent = transformToPortableText(parsedTree);
+// const parsedTree = nodeParse(elements.body_copy.value);
+// const parsedContent = transformToPortableText(parsedTree);
 
-for (const block of parsedContent) {
-  if (block._type === "component") {
-    (block as any).data = { value: "some data I would like to add to all components" };
-  }
+// for (const block of parsedContent) {
+//   if (block._type === "component") {
+//     (block as any).data = {
+//       value: "some data I would like to add to all components",
+//     };
+//   }
 
-  // pass only data to specific components by its reference
-}
+//   // pass only data to specific components by its reference
+// }
 ---
 
 <Layout title="Welcome to Astro.">
@@ -73,13 +75,6 @@ for (const block of parsedContent) {
     <h1>{system.name} ({system.codename})</h1>
     <!-- <time>{elements['post_date'].value}</time> -->
     <!-- <article set:html={elements['body_copy'].value} /> -->
-    <PortableText
-      value={parsedContent}
-      components={{
-        type: {
-          component: Test,
-        },
-      }}
-    />
+    <!-- <PortableText value={parsedContent} } /> -->
   </main>
 </Layout>

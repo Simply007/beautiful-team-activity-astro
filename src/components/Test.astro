@@ -2,11 +2,22 @@
 const data = Astro.props;
 
 // There could be the component resolution function
+const cache: any[] = [];
+const normalizedData = JSON.stringify(data, (key, value) => {
+  if (typeof value === 'object' && value !== null) {
+    // Duplicate reference found, discard key
+    if (cache.includes(value)) return;
+
+    // Store value in our collection
+    cache.push(value);
+  }
+  return value;
+  }, 2)
 ---
 
 <div>
   <div>Test component</div>
   <pre>
-    {JSON.stringify(data, undefined, 2)}
+    {normalizedData}
 </pre>
 </div>
